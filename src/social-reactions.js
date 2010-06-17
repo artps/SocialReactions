@@ -1,3 +1,9 @@
+Function.prototype.bind = function(ctx) {
+    var self = this;
+    return function(){
+        return self.apply(ctx, arguments);
+    }
+};
 
 var Utils = {
     queryString: function(hash){
@@ -36,7 +42,7 @@ Wrapper.Mootools.prototype = {
         new Request.JSONP({
             url: options.url,
             data: options.data,
-            oncomplete: options.oncomplete
+            onComplete: options.oncomplete
         }).send()
     }
 };
@@ -85,7 +91,7 @@ Service.FriendFeed.prototype = {
     },
 
     parseResponse: function(data){
-        return data.entries;
+        return data;
     }
 };
 
@@ -116,13 +122,12 @@ Reactions.prototype = {
 
     fetch: function() {
         Utils.each(this.services, function(service){
-            var self = this;
             var oncomplete = function(data) {
-                self.fire('complete', [
+                this.fire('complete', [
                     service.parseResponse(data),
                     service.name
                 ]);
-            };
+            }.bind(this);
             this.wrapper.request({
                 url: service.apiurl,
                 data: service.data,
